@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Freja-dev] bug #8331 deconstructed
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/freja-dev/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:freja-dev%40lists.berlios.de?Subject=Re%3A%20%5BFreja-dev%5D%20bug%20%238331%20deconstructed&In-Reply-To=%3C44DB9DBB.8030109%404213miles.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Freja-dev] bug #8331 deconstructed</H1>
+    <B>Cedric Savarese</B> 
+    <A HREF="mailto:freja-dev%40lists.berlios.de?Subject=Re%3A%20%5BFreja-dev%5D%20bug%20%238331%20deconstructed&In-Reply-To=%3C44DB9DBB.8030109%404213miles.com%3E"
+       TITLE="[Freja-dev] bug #8331 deconstructed">c.savarese at 4213miles.com
+       </A><BR>
+    <I>Thu Aug 10 22:57:31 CEST 2006</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#0">[ date ]</a>
+              <a href="thread.html#0">[ thread ]</a>
+              <a href="subject.html#0">[ subject ]</a>
+              <a href="author.html#0">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi all,
+
+
+I modified the model test case to illustrate the bug #8331.
+(in svn : /trunk/tests/test_Freja-Model.html )
+
+Here is the problem:
+
+* The _find method returns a text-node (in Freja.QueryEngine.XPath and 
+Freja.QueryEngine.SimplePath)
+* There are three different cases where a text-node cannot be returned.
+    1. The xpath expression cannot be evaluated because there is no such 
+element.
+    2. The xpath expression cannot be evaluated because it refers to a 
+non-existent attribute.
+    3. The xpath expression refers to an existing element that does not 
+have a text node (&lt;element&gt;&lt;/element&gt;).
+
+All three cases raise a &quot;Can't evaluate expression&quot; exception. This is 
+ok when _find is used by the model.get method, but doesn't work in 
+conjunction with model.set.
+
+At this time, Model.set handles #2 by doing another _find on the parent 
+element and creating the attribute before setting its value. It works, 
+but it basically has to do the work two times.
+
+Case #3 is not handled. There is no way to use _find to get a hold on 
+the element itself, so the text-node cannot be created and set.
+
+
+I cannot find a way to handle case#3 other than creating the text-node 
+in _find.
+
+
+cedric
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#0">[ date ]</a>
+              <a href="thread.html#0">[ thread ]</a>
+              <a href="subject.html#0">[ subject ]</a>
+              <a href="author.html#0">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/freja-dev">More information about the Freja-dev
+mailing list</a><br>
+</body></html>
